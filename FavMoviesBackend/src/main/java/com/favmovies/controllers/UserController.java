@@ -7,16 +7,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @GetMapping("/")
-    public String main(){
-        return "<HTML>Welcome to My Webpage</HTML>";
-    }
 
     @GetMapping("/users")
     public List<User> getUsersList(){

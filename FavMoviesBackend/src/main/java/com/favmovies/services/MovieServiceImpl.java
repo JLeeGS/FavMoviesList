@@ -3,10 +3,12 @@ package com.favmovies.services;
 import com.favmovies.models.Movie;
 import com.favmovies.repositories.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class MovieServiceImpl implements MovieService {
 
     @Autowired
