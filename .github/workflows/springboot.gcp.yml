@@ -21,12 +21,9 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Maven Package 
-      env: 
-#           OIMDB_API_KEY : ${{ secrets.OIMDB_API_KEY }} 
-          MYSQL_URL : ${{ secrets.MYSQL_URL }}
-          MYSQL_USERNAME : ${{ secrets.MYSQL_USERNAME }}
-          MYSQL_PASSWORD : ${{ secrets.MYSQL_PASSWORD }}
       run: mvn -B package --file pom.xml
+    - name: Maven Verify
+      run: mvn -B clean verify
       
     - name: GCP Deploy 
   deploy:
