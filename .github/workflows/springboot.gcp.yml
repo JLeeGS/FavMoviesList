@@ -1,0 +1,50 @@
+name: SpringBootGCP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: Maven Package 
+      env: 
+#           OIMDB_API_KEY : ${{ secrets.OIMDB_API_KEY }} 
+          MYSQL_URL : ${{ secrets.MYSQL_URL }}
+          MYSQL_USERNAME : ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD : ${{ secrets.MYSQL_PASSWORD }}
+      run: mvn -B package --file pom.xml
+      
+    - name: GCP Deploy 
+  deploy:
+    name: Deploy Cloud Workflow
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    - name: Use gcloud CLI
+      run: |
+        gcloud workflows deploy myWorkflowFromGitHub \
+        --location us-central1-a \
+        --source springboot.gcp.yml \
+        --project ${{ secrets.GCP_PROJECT_ID }} \
+        --labels "commit-sha=${{ github.sha }}" \
+        --service-account my-wf-service-account@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
